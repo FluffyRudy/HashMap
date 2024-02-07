@@ -1,0 +1,25 @@
+{
+  "name": "hashmap",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "The implementation of hashmap",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FluffyRudy/HashMap.git"
+  },
+  "keywords": [
+    "hashmap",
+    "hash",
+    "table"
+  ],
+  "author": "FluffyRudy",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/FluffyRudy/HashMap/issues"
+  },
+  "homepage": "https://github.com/FluffyRudy/HashMap#readme"
+}
