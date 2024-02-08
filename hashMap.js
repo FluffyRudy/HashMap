@@ -1,10 +1,9 @@
 import { LinkedList } from "./linkedList.js";
 
-class HashMap {
+export class HashMap {
     #initialCapacity = 16;
     #buckets = new Array(this.#initialCapacity).fill(null)
-                .map(elem => new LinkedList());
-    #keys = [];
+                .map(() => new LinkedList());
     
     constructor() {
         this.capacity = this.#initialCapacity;
@@ -21,58 +20,80 @@ class HashMap {
         return hashCode;
     }
 
-    getKeyIndex(key) {
+    getKeyIndex(key, capacity) {
         let keyValue = 0;
         for (let i = 0; i < key.length; i++) {
             keyValue = keyValue + key.charCodeAt(i);
         }
-        return keyValue % this.capacity;
-    }
-
-    getHashBucketAndNode(key) {
-        const keyBucket = this.getKeyIndex(key);
-        const hashCode = this.generateHash(key);
-        const currentBucket = this.#buckets[keyBucket];
-        const node = currentBucket.find(hashCode); //to check if same key exist
-        return {hashCode, currentBucket, node};
+        return keyValue % capacity;
     }
 
     set(key, value) {
         if (!isNaN(key))
             key = String(key);
-        const { hashCode, currentBucket, node } = this.getHashBucketAndNode(key);
+            const bucketIndex = this.getKeyIndex(key, this.capacity);
+            const hashCode = this.generateHash(key);
+            const currentBucket = this.#buckets[bucketIndex];
+            const node = currentBucket.find(hashCode);
         if (!node) {
-            currentBucket.append(hashCode, value);
+            currentBucket.append(hashCode, {key, value})
             this.length++;
         } else {
-            node.value = value;
+            node.value = value.value;
         }
 
-        this.#keys.push(key);
+        if (this.isLoadFactorExceed()) {
+            this.expand();
+        }
     }
 
     get(key) {
-        const { node } = this.getHashBucketAndNode(key);
+        const bucketIndex = this.getKeyIndex(key, this.capacity);
+        const hashCode = this.generateHash(key);
+        const node = this.#buckets[bucketIndex].find(hashCode);
         if (!node)
             throw Error(`KeyError \'${key}\'`);
-        return node.value;
+        return node.value.value;
     }
 
     getItems() {
-        return this.#keys.map(key => {
-            return [ key, this.get(key) ]
-        });
+        const items = [];
+        for (let elem of this.#buckets) {
+            let current = elem.head();
+            while (current) {
+                items.push([current.value.key, current.value.value]);
+                current = current.next;
+            }
+        }
+        return items;
     }
 
+    expand() {
+        const newCapacity = this.capacity * 2;
+        const newBucket = new Array(newCapacity).fill(null)
+                          .map(() => new LinkedList());
+        for (let i = 0; i < this.capacity; i++) {
+            let current = this.#buckets[i].head();
+            while (current) {
+                const {key, value} = current.value;
+                const newBucketIndex = this.getKeyIndex(key, newCapacity);
+                newBucket[newBucketIndex].append(current.key, {key, value})
+                current = current.next;
+            }
+        }
+        this.capacity = newCapacity;
+        this.#buckets = newBucket;
+    }
     isLoadFactorExceed() {
         const sizeCapacityRatio = (this.length / this.capacity);
         if (sizeCapacityRatio >= this.loadFactor)
             return true;
         return false;
     }
-}
 
-const a = new HashMap();
-a.set(12, "12");
-a.set("bc", 120);
-console.log(a.getItems());
+    viewBuckets() {
+        for (let elem of this.#buckets) {
+            console.log(elem.toString())
+        }
+    }
+}
