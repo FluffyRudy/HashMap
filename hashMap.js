@@ -90,10 +90,4 @@ export class HashMap {
             return true;
         return false;
     }
-
-    viewBuckets() {
-        for (let elem of this.#buckets) {
-            console.log(elem.toString())
-        }
-    }
 }
