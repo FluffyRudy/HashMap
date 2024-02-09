@@ -45,41 +45,6 @@ export class LinkedList {
         return this.#_head;
     }
 
-    tail() {
-        return this.#_tail;
-    }
-
-    at(index) {
-        if (index < 0 || index >= this.#_size)
-            throw Error("IndexError: index out of range");
-        let temp = this.#_head;
-        let localIndex = 0;
-        while (temp !== null) {
-            if (localIndex === index)
-                return temp;
-            localIndex++;
-            temp = temp.next;
-        }
-        return temp;
-    }
-
-    pop() {
-        if (this.#_size === 0)
-            throw Error("IndexError: pop from empty list");
-        if (this.#_size === 1) {
-            this.#_head = null;
-            this.#_tail = null;
-        } else {
-            let temp = this.#_head;
-            while (temp.next.next != null) {
-                temp = temp.next;
-            }
-            temp.next = null;
-            this.#_tail = temp;
-        }
-        this.#_size--;
-    }
-
     find(key) {
         let temp = this.#_head;
         let i = 0;
@@ -92,50 +57,28 @@ export class LinkedList {
         return null;
     }
 
-    contains(key) {
-        return this.find(key) === null ? false : true;
-    }
+    remove(key) {
+        let current = this.head();
+        if (current === null)
+            return current;
 
-    insertAt(key, value, index) {
-        if (index < 0 || index >= this.#_size)
-          throw Error("IndexError: index out of range");
-        if (index === 0)
-            this.prepend(key, value);
-        else if (index === this.#_size-1)
-            this.append(key, value);
-        else {
-            let i = 0;
-            let temp = this.#_head;
-            while (temp.next != null && i+1 !== index) {
-                temp = temp.next;
-                i++;
-            }
-            const newNode = new Node(key, value);
-            newNode.next = temp.next;
-            temp.next = newNode;
-            this.size++;
-        }
-    }
-
-    removeAt(index) {
-        if (index < 0 || index >= this.#_size)
-            throw Error("IndexError: index out of range");
-        if (index === 0) {
+        if (this.#_head.key === key) {
+            const value = this.#_head.value;
             this.#_head = this.#_head.next;
             this.#_size--;
+            return value;
         }
-        else if (index === this.#_size - 1)
-            this.pop();
-        else {
-            let i = 0;
-            let temp = this.#_head;
-            while (temp.next != null && i+1 !== index) {
-                temp = temp.next;
-                i++;
+
+        while (current && current.next != null) {
+            if (current.next.key === key) {
+                const value = current.next.value;
+                current.next = current.next.next;
+                this.#_size--;
+                return value;
             }
-            temp.next = temp.next.next;
-            this.#_size--;
+            current = current.next;
         }
+        return null;
     }
 
     toString() {
