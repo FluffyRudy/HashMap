@@ -52,8 +52,13 @@ export class HashMap {
         const hashCode = this.generateHash(key);
         const node = this.#buckets[bucketIndex].find(hashCode);
         if (!node)
-            throw Error(`KeyError \'${key}\'`);
+            return null;
         return node.value.value;
+    }
+
+    remove(key) {
+        return this.#buckets[this.getKeyIndex(key, this.capacity)]
+                    .remove( this.generateHash(key));
     }
 
     getItems() {
@@ -90,4 +95,16 @@ export class HashMap {
             return true;
         return false;
     }
+
+    toString() {
+        const allItems = this.getItems();
+        const obj = {};
+        allItems.forEach(item => {
+            obj[item[0]] = item[0];
+        })
+        return obj;
+    }
 }
+
+
+
